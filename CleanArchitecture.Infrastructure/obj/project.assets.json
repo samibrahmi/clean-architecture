@@ -1,11 +1,49 @@
 {
   "version": 3,
   "targets": {
-    "net9.0": {}
+    "net9.0": {
+      "CleanArchitecture.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "CleanArchitecture.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/CleanArchitecture.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CleanArchitecture.Application.dll": {}
+        }
+      },
+      "CleanArchitecture.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/CleanArchitecture.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CleanArchitecture.Domain.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "CleanArchitecture.Application/1.0.0": {
+      "type": "project",
+      "path": "../CleanArchitecture.Application/CleanArchitecture.Application.csproj",
+      "msbuildProject": "../CleanArchitecture.Application/CleanArchitecture.Application.csproj"
+    },
+    "CleanArchitecture.Domain/1.0.0": {
+      "type": "project",
+      "path": "../CleanArchitecture.Domain/CleanArchitecture.Domain.csproj",
+      "msbuildProject": "../CleanArchitecture.Domain/CleanArchitecture.Domain.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net9.0": []
+    "net9.0": [
+      "CleanArchitecture.Application >= 1.0.0",
+      "CleanArchitecture.Domain >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\brasa01\\.nuget\\packages\\": {},
@@ -38,7 +76,14 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.Application\\CleanArchitecture.Application.csproj": {
+              "projectPath": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.Application\\CleanArchitecture.Application.csproj"
+            },
+            "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.Domain\\CleanArchitecture.Domain.csproj": {
+              "projectPath": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.Domain\\CleanArchitecture.Domain.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
