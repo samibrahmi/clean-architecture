@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.WebUI.csproj": {}
+    "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj": {}
   },
   "projects": {
     "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.Application\\CleanArchitecture.Application.csproj": {
@@ -138,12 +138,12 @@
         }
       }
     },
-    "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.WebUI.csproj": {
+    "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.WebUI.csproj",
-        "projectName": "CleanArchitecture.WebUI",
-        "projectPath": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.WebUI.csproj",
+        "projectUniqueName": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj",
+        "projectName": "CleanArchitecture.Presentation",
+        "projectPath": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj",
         "packagesPath": "C:\\Users\\brasa01\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\obj\\",
         "projectStyle": "PackageReference",
@@ -187,6 +187,12 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.SpaServices.Extensions": {
+              "target": "Package",
+              "version": "[9.0.2, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "MELCFFP",
+    "classifications": [ "CleanArchitecture", "Web", "ASP.NET Core", "React", "Enterprise" ],
+    "identity": "MELCFFP.CleanArchitecture.Template",
+    "name": "Gabarit .NET avec SPA React",
+    "shortName": "gabarit-melcffp",
+    "tags": {
+      "language": "C#",
+      "type": "project"
+    },
+    "sourceName": "CleanArchitecture",
+    "preferNameDirectory": true,
+    "symbols": {
+      "ProjectName": {
+        "type": "parameter",
+        "datatype": "string",
+        "replaces": "CleanArchitecture",
+        "fileRename": "CleanArchitecture"
+      }
+    },
+    "primaryOutputs": [
+      {
+        "path": "CleanArchitecture.sln"
+      }
+    ]
+  }
+  

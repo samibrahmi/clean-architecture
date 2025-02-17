@@ -1,0 +1,36 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9C0D4B97-520D-4637-B052-5BC9FBD153FE}|CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj|c:\\users\\brasa01\\repos\\template_architecture_sami\\cleanarchitecture.webui\\cleanarchitecture.presentation.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{9C0D4B97-520D-4637-B052-5BC9FBD153FE}|CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj|solutionrelative:cleanarchitecture.webui\\cleanarchitecture.presentation.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CleanArchitecture.Presentation",
+              "DocumentMoniker": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj",
+              "RelativeDocumentMoniker": "CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj",
+              "ToolTip": "C:\\Users\\brasa01\\repos\\template_architecture_sami\\CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj",
+              "RelativeToolTip": "CleanArchitecture.WebUI\\CleanArchitecture.Presentation.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-02-13T16:47:27.719Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
