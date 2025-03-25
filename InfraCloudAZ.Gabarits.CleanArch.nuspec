@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>InfraCloudAZ.Gabarits.CleanArch</id>
+    <version>1.0.0</version>
+    <title>QC380 - Gabarit d'applications Clean Architecture</title>
+    <authors>QC380</authors>
+    <description>Gabarit d'applications Clean Architecture pour les applications du MELCCFP</description>
+    <tags>clean-architecture template dotnet-new</tags>
+    <icon>icon.png</icon>
+    <packageTypes>
+      <packageType name="Template" />
+    </packageTypes>
+    <readme>README.md</readme>
+  </metadata>
+  <files>
+    <file src="**\*" exclude="**\bin\**;**\obj\**;**\.git\**;**\.vs\**;**\node_modules\**;**\.template.config\**\*;*.nuspec;*.nupkg" target="content" />
+    <file src=".template.config\**\*" target="content\.template.config" />
+    <file src=".template.config\icon.png" target="icon.png" />
+    <file src="README.md" />
+  </files>
+</package>

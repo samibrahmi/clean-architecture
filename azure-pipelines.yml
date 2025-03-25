@@ -1,0 +1,234 @@
+# ====================================================
+# Pipeline de build et déploiement pour le template Clean Architecture
+# ====================================================
+
+# Configuration du déclenchement
+trigger:
+  branches:
+    include:
+    - main
+    - feat/*
+    - feature/*
+    - feature*
+# Configuration de l'environnement d'exécution
+pool:
+  vmImage: 'windows-latest'
+
+# Variables globales
+variables:
+  # Configuration générale
+  buildConfiguration: 'Release'
+  
+  # Configuration NuGet
+  # Options possibles pour le feed:
+  # - Format "NomDuProjet/NomDuFeed" pour un feed au niveau projet 
+  # - Format "NomDuFeed" pour un feed au niveau organisation
+  nugetFeedName: 'InfraCloudAZ-templates'
+  nugetFeedUrl: 'https://pkgs.dev.azure.com/qc380/_packaging/InfraCloudAZ-templates%40Local/nuget/v3/index.json'
+  packageName: 'InfraCloudAZ.Gabarits.CleanArch'
+  
+  # Configuration de versionnement automatique
+  majorVersion: '1'
+  minorVersion: '1'
+  defaultPatchVersion: '1'  # Utilisé uniquement si aucune version précédente n'est trouvée
+
+# ====================================================
+# Étapes du pipeline
+# ====================================================
+
+stages:
+# ====================================================
+# Stage 1: Construction du package
+# ====================================================
+- stage: Build
+  displayName: 'Construction du package NuGet'
+  jobs:
+  - job: CreateNuGetPackage
+    displayName: 'Créer le package NuGet'
+    steps:
+    # --- Installation des outils nécessaires ---
+    - task: NuGetToolInstaller@1
+      displayName: 'Installer NuGet'
+      inputs:
+        versionSpec: '6.x'
+
+    # --- Récupération de la dernière version et calcul du numéro ---
+    - task: PowerShell@2
+      displayName: 'Déterminer le numéro de version'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "=== Récupération de la dernière version du package ==="
+          
+          # Initialisation des variables par défaut
+          $currentMajor = "$(majorVersion)"
+          $currentMinor = "$(minorVersion)"
+          $currentPatch = "$(defaultPatchVersion)"
+          $buildId = $env:BUILD_BUILDID
+          
+          $sourceUrl = "$(nugetFeedUrl)"
+          $packageName = "$(packageName)"
+          
+          try {
+              # Configuration de l'authentification pour le feed
+              Write-Host "Configuration de l'accès au feed $sourceUrl..."
+              $accessToken = "$(System.AccessToken)"
+              $feedSource = "TempFeedSource"
+              
+              # Ajouter le feed temporairement avec authentification
+              nuget sources Add -Name "$feedSource" -Source "$sourceUrl" -Username "azuredevops" -Password "$accessToken" -NonInteractive
+              
+              # Récupérer les versions disponibles
+              Write-Host "Recherche des versions existantes pour '$packageName'..."
+              $listOutput = nuget list $packageName -Source "$feedSource" -AllVersions -PreRelease -Verbosity detailed
+              
+              Write-Host "Sortie de nuget list:"
+              foreach ($line in $listOutput) {
+                  Write-Host "  $line"
+              }
+              
+              # Rechercher la version dans la sortie
+              $versionPattern = "$packageName\s+([\d\.]+)"
+              $matches = $listOutput | Select-String -Pattern $versionPattern
+              
+              if ($matches -and $matches.Count -gt 0) {
+                  $latestVersionLine = $matches[0]
+                  if ($latestVersionLine -match $versionPattern) {
+                      $latestVersion = $matches[0].Matches[0].Groups[1].Value
+                      Write-Host "Dernière version trouvée: $latestVersion"
+                      
+                      # Extraire les composants de la version
+                      $versionParts = $latestVersion -split '\.'
+                      if ($versionParts.Length -ge 4) {
+                          $currentMajor = $versionParts[0]
+                          $currentMinor = $versionParts[1]
+                          $currentPatch = [int]$versionParts[2] + 1  # Incrémenter le correctif
+                          
+                          Write-Host "Version actuelle: $latestVersion"
+                          Write-Host "Nouvelle version: $currentMajor.$currentMinor.$currentPatch.$buildId"
+                      } else {
+                          Write-Host "Format de version inattendu. Utilisation des valeurs par défaut."
+                      }
+                  }
+              } else {
+                  Write-Host "Aucune version trouvée. Utilisation des valeurs par défaut."
+              }
+              
+              # Supprimer la source temporaire
+              nuget sources Remove -Name "$feedSource" -NonInteractive
+          }
+          catch {
+              Write-Host "Erreur lors de la récupération des versions: $_"
+              Write-Host "Utilisation des valeurs par défaut."
+          }
+          
+          # Générer le numéro final de version
+          $versionNumber = "$currentMajor.$currentMinor.$currentPatch.$buildId"
+          
+          Write-Host "=== Numéro de version final: $versionNumber ==="
+          Write-Host "##vso[task.setvariable variable=PackageVersion]$versionNumber"
+          
+          # Assurer que la tâche ne génère pas d'erreur
+          exit 0
+
+    # --- Validation de la structure du template ---
+    - task: PowerShell@2
+      displayName: 'Valider la structure du template'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "=== Validation de la structure du template ==="
+          $templateConfigPath = ".template.config/template.json"
+          
+          if (-not (Test-Path $templateConfigPath)) {
+            Write-Error "❌ Configuration du template non trouvée!"
+            exit 1
+          } else {
+            Write-Host "✅ Configuration du template trouvée."
+          }
+
+    # --- Création du package NuGet ---
+    - task: NuGetCommand@2
+      displayName: 'Créer le package NuGet'
+      inputs:
+        command: 'pack'
+        packagesToPack: '**/InfraCloudAZ.Gabarits.CleanArch.nuspec'
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: 'PackageVersion'
+
+    # --- Publication des artefacts ---
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publier les artefacts de build'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'package'
+        publishLocation: 'Container'
+
+# ====================================================
+# Stage 2: Déploiement vers Azure Artifacts
+# ====================================================
+- stage: Deploy
+  displayName: 'Déploiement vers Azure Artifacts'
+  dependsOn: Build
+  condition: succeeded() 
+  jobs:
+  - job: PublishToArtifacts
+    displayName: 'Publier vers Azure Artifacts'
+    # Utiliser l'identité du projet au lieu de l'identité par défaut
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    # --- Récupération des artefacts de build ---
+    - task: DownloadBuildArtifacts@1
+      displayName: 'Télécharger les artefacts de build'
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'package'
+        downloadPath: '$(System.ArtifactsDirectory)'
+
+    # --- Configuration de l'authentification NuGet avec plus d'options ---
+    - task: NuGetAuthenticate@0
+      displayName: 'Configurer l''authentification NuGet'
+      inputs:
+        forceReinstallCredentialProvider: true
+
+    # --- Affichage des informations d'authentification pour débogage ---
+    - task: PowerShell@2
+      displayName: 'Vérifier le contexte d''authentification'
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "=== Informations sur le contexte d'exécution ==="
+          Write-Host "Identity: $env:IDENTITY_HEADER"
+          Write-Host "Feed URL: $(nugetFeedUrl)"
+          Write-Host "Feed Name: $(nugetFeedName)"
+          
+          # Configurer explicitement la source NuGet avec authentification
+          Write-Host "Configuration explicite de la source NuGet..."
+          
+          # Utiliser le jeton d'accès System.AccessToken
+          $feedUrl = "$(nugetFeedUrl)"
+          $accessToken = "$(System.AccessToken)"
+          
+          # Configurer NuGet pour utiliser le jeton d'accès
+          nuget sources Add -Name "InfraCloudAZFeed" -Source "$feedUrl" -Username "azuredevops" -Password "$accessToken"
+          
+          Write-Host "Sources NuGet configurées:"
+          nuget sources List
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+    # --- Déploiement vers Azure Artifacts avec authentification explicite ---
+    - task: NuGetCommand@2
+      displayName: 'Publier le package vers Azure Artifacts'
+      inputs:
+        command: 'push'
+        packagesToPush: '$(System.ArtifactStagingDirectory)/package/*.nupkg'
+        nuGetFeedType: 'internal'
+        publishVstsFeed: '$(nugetFeedName)'
+        allowPackageConflicts: true
+        verbosityPush: 'Detailed'
+      env:
+        NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: 'true'
+        VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials": [{"endpoint":"$(nugetFeedUrl)", "username":"azuredevops", "password":"$(System.AccessToken)"}]}'

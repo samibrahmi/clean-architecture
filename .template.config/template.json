@@ -1,28 +1,145 @@
 {
-    "$schema": "http://json.schemastore.org/template",
-    "author": "MELCFFP",
-    "classifications": [ "CleanArchitecture", "Web", "ASP.NET Core", "React", "Enterprise" ],
-    "identity": "MELCFFP.CleanArchitecture.Template",
-    "name": "Gabarit .NET avec SPA React",
-    "shortName": "gabarit-melcffp",
-    "tags": {
-      "language": "C#",
-      "type": "project"
-    },
-    "sourceName": "CleanArchitecture",
-    "preferNameDirectory": true,
-    "symbols": {
-      "ProjectName": {
-        "type": "parameter",
-        "datatype": "string",
-        "replaces": "CleanArchitecture",
-        "fileRename": "CleanArchitecture"
+  "$schema": "http://json.schemastore.org/template",
+  "author": "QC380",
+  "classifications": ["Architecture clean", "ASP.NET Core", "React", "Entreprise"],
+  "name": "QC380- Gabarit d'applications Clean Architecture",
+  "description": "Gabarit d'applications Clean Architecture avec ASP.NET Core et React",
+  "identity": "QC380.CleanArchitecture.Template",
+  "groupIdentity": "QC380.CleanArchitecture",
+  "shortName": "arch-clean",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "CleanArchitecture",
+  "preferNameDirectory": true,
+  "icon": "icon.png",
+  "symbols": {
+    "BusinessDomain": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Nom du domaine d'affaires (ex : Eau, SOL, etc.)",
+      "defaultValue": "Domaine d'affaire",
+      "replaces": "BusinessDomain",
+      "validators": {
+        "regex": {
+          "pattern": "^[a-zA-Z][a-zA-Z0-9]{0,19}$",
+          "description": "Le nom du domaine d'affaires doit commencer par une lettre et contenir uniquement des lettres et des chiffres (maximum 20 caractères)."
+        }
       }
     },
-    "primaryOutputs": [
-      {
-        "path": "CleanArchitecture.sln"
+    "Product": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Nom court du produit. Peut être composé de sous-produits séparés par un point. Chaque partie doit contenir un maximum 20 caractères.",
+      "defaultValue": "Nom du produit",
+      "replaces": "Product",
+      "validators": {
+        "regex": {
+          "pattern": "^[a-zA-Z][a-zA-Z0-9.]{0,39}$",
+          "description": "Le nom du produit doit commencer par une lettre et peut contenir des lettres, des chiffres et des points (maximum 40 caractères)."
+        }
       }
-    ]
-  }
-  
+    },
+    "Component": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Nom du composant du produit (ex : Commande, Paiement, etc.)",
+      "defaultValue": "Nom du composant",
+      "replaces": "Component",
+      "validators": {
+        "regex": {
+          "pattern": "^[a-zA-Z][a-zA-Z0-9]{0,19}$",
+          "description": "Le nom du composant doit commencer par une lettre et contenir uniquement des lettres et des chiffres (maximum 20 caractères)."
+        }
+      }
+    },
+    "ComponentType": {
+      "type": "parameter",
+      "datatype": "choice",
+      "description": "Type de composant : IU, API, BD, LOT, BC.",
+      "choices": [
+        {
+          "choice": "IU",
+          "description": "Interface Utilisateur"
+        },
+        {
+          "choice": "API",
+          "description": "Application Programming Interface"
+        },
+        {
+          "choice": "BD",
+          "description": "Base de Données"
+        },
+        {
+          "choice": "LOT",
+          "description": "Traitement par lots"
+        },
+        {
+          "choice": "BC",
+          "description": "Composant d'affaires"
+        }
+      ],
+      "defaultValue": "API",
+      "replaces": "ComponentType"
+    },
+    "InclureTests": {
+      "type": "parameter",
+      "datatype": "bool",
+      "displayName": "Inclure les tests",
+      "description": "Inclure les projets de tests unitaires et d'intégration",
+      "defaultValue": "true"
+    },
+    "BaseName": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "BusinessDomain",
+        "fallbackVariableName": "Product"
+      },
+      "replaces": "BaseName"
+    }
+    
+   
+  },
+
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!InclureTests)",
+          "exclude": ["**/tests/**", "**/*.Tests/**", "**/*Tests.csproj"]
+        },
+        {
+          "condition": "(ComponentType == \"API\")",
+          "exclude": [
+            "**/clientapp/**",
+            "**/src/**/Presentation/Client/**",
+            "**/tests/**/*Presentation.TestsAcceptation/**",
+            "**/tests/**/*TestsAcceptation/**"
+          ]
+        },
+        {
+          "exclude": ["**/[Bb]in/**", "**/[Oo]bj/**", ".template.config/**", "**/node_modules/**", "**/.vs/**", "**/.git/**", "**/Dockerfile", "**/docker-compose.yml"]
+        }
+      ],
+      "rename": {
+        "src/CleanArchitecture/": "src/{{SolutionName}}/",
+        "tests/CleanArchitecture.Tests/": "tests/{{SolutionName}}.Tests/",
+        "CleanArchitecture.sln": "{{SolutionName}}.sln"
+      }
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Restaurer les packets Nuget nécessaire.",
+      "manualInstructions": [
+        {
+          "text": "Exécuter 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

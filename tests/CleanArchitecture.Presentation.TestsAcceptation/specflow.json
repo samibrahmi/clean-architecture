@@ -1,0 +1,14 @@
+{
+  "bindingCulture": {
+    "name": "fr-CA"
+  },
+  "language": {
+    "feature": "fr"
+  },
+  "stepAssemblies": [
+    { "assembly": "CleanArchitecture.Presentation.TestsAcceptation" }
+  ],
+  "unitTestProvider": {
+    "name": "xUnit"
+  }
+}
